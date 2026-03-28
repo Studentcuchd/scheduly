@@ -1,0 +1,1 @@
+import{_ as e,b as t}from"./parseISO-CLFmLC7F.js";function n(n,r,i){let a=e(n,i?.in);return a.setTime(a.getTime()+r*t),a}export{n as t};

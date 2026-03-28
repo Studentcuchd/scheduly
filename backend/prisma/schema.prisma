@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(uuid())
+  username     String        @unique @default(cuid())
+  name         String        @default("Default User")
+  email        String        @unique @default("admin@scheduly.com")
+  timezone     String        @default("Asia/Kolkata")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  availability Availability?
+  eventTypes   EventType[]
+  meetings     Meeting[]
+}
+
+model EventType {
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  duration    Int
+  color       String    @default("#0069ff")
+  description String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  meetings    Meeting[]
+}
+
+model Availability {
+  id        String            @id @default(uuid())
+  timezone  String            @default("Asia/Kolkata")
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  userId    String            @unique
+  user      User              @relation(fields: [userId], references: [id])
+  days      AvailabilityDay[]
+}
+
+model AvailabilityDay {
+  id             String       @id @default(uuid())
+  dayOfWeek      Int
+  isEnabled      Boolean      @default(true)
+  startTime      String
+  endTime        String
+  availabilityId String
+  availability   Availability @relation(fields: [availabilityId], references: [id])
+}
+
+model Meeting {
+  id           String        @id @default(uuid())
+  inviteeName  String
+  inviteeEmail String
+  date         String
+  startTime    String
+  endTime      String
+  notes        String?
+  status       MeetingStatus @default(UPCOMING)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  eventTypeId  String
+  userId       String
+  eventType    EventType     @relation(fields: [eventTypeId], references: [id])
+  user         User          @relation(fields: [userId], references: [id])
+}
+
+enum MeetingStatus {
+  UPCOMING
+  PAST
+  CANCELLED
+}

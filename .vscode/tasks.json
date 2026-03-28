@@ -1,0 +1,16 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Reorganize into frontend-backend",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"Move-Item -Path dist,eslint.config.js,index.html,node_modules,package-lock.json,package.json,postcss.config.js,public,README.md,src,tailwind.config.js,vite.config.js -Destination frontend -Force"
+			],
+			"isBackground": false
+		}
+	]
+}

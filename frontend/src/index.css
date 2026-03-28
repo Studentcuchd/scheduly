@@ -1,0 +1,220 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "Manrope", system-ui, -apple-system, sans-serif;
+  --brand-primary: #0f6fff;
+  --brand-primary-deep: #0c4ec5;
+  --brand-ink: #101828;
+  --brand-muted: #667085;
+  --brand-bg: #f6f8fc;
+  --brand-border: #e4e7ec;
+  --brand-card-bg: #ffffff;
+  --brand-text-secondary: #475569;
+  --brand-success: #10b981;
+  --brand-warning: #f59e0b;
+  --brand-error: #ef4444;
+}
+
+html.dark {
+  --brand-primary: #3b82f6;
+  --brand-primary-deep: #2563eb;
+  --brand-ink: #f1f5f9;
+  --brand-muted: #94a3b8;
+  --brand-bg: #0f172a;
+  --brand-border: #334155;
+  --brand-card-bg: #1e293b;
+  --brand-text-secondary: #cbd5e1;
+  --brand-success: #10b981;
+  --brand-warning: #f59e0b;
+  --brand-error: #ef4444;
+}
+
+body {
+  margin: 0;
+  color: var(--brand-ink);
+  background: var(--brand-bg);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 100vh;
+}
+
+body:not(.dark) {
+  background:
+    radial-gradient(circle at 0% 0%, rgba(15, 111, 255, 0.12), transparent 32%),
+    radial-gradient(circle at 100% 20%, rgba(0, 168, 107, 0.11), transparent 34%),
+    linear-gradient(180deg, #f9fbff 0%, var(--brand-bg) 45%, #f5f8fd 100%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+h1,
+h2,
+h3 {
+  font-family: "Sora", "Manrope", system-ui, -apple-system, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* Responsive Typography */
+h1 {
+  font-size: clamp(24px, 5vw, 48px);
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: clamp(20px, 4vw, 32px);
+  line-height: 1.3;
+}
+
+h3 {
+  font-size: clamp(16px, 3vw, 24px);
+  line-height: 1.4;
+}
+
+p {
+  font-size: clamp(14px, 2vw, 16px);
+  line-height: 1.6;
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(228, 231, 236, 0.9);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 14px 32px rgba(16, 24, 40, 0.07);
+  transition: all 0.3s ease;
+}
+
+html.dark .glass-panel {
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(51, 65, 85, 0.5);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.3);
+}
+
+.glass-panel:hover {
+  box-shadow: 0 20px 40px rgba(16, 24, 40, 0.1);
+}
+
+html.dark .glass-panel:hover {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.hero-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 111, 255, 0.25);
+  background: rgba(15, 111, 255, 0.09);
+  color: var(--brand-primary-deep);
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  transition: all 0.2s ease;
+}
+
+html.dark .hero-chip {
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  background: rgba(59, 130, 246, 0.12);
+}
+
+.hero-chip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(15, 111, 255, 0.2);
+}
+
+/* Responsive utilities */
+@layer utilities {
+  .safe-padding {
+    @apply px-4 py-6 md:px-6 md:py-8 lg:px-8;
+  }
+
+  .container-responsive {
+    @apply w-full max-w-7xl mx-auto;
+  }
+
+  .scroll-smooth {
+    scroll-behavior: smooth;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Mobile-first responsive heights */
+  .mobile-view-height {
+    @apply min-h-screen md:min-h-0;
+  }
+
+  /* Touch-friendly targets */
+  .touch-target {
+    @apply p-3 md:p-2;
+    min-height: 48px;
+    min-width: 48px;
+    @apply flex items-center justify-center;
+  }
+
+  /* Responsive grid */
+  .grid-auto-fit {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  }
+
+  .grid-auto-fill {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+  }
+}
+
+@layer components {
+  .ui-label {
+    @apply mb-1.5 block text-sm font-medium;
+    color: var(--brand-text-secondary);
+  }
+
+  .ui-helper {
+    @apply mt-1 block text-xs;
+    color: var(--brand-muted);
+  }
+
+  .ui-input,
+  .ui-select,
+  .ui-textarea {
+    @apply w-full rounded-xl border px-3.5 text-sm outline-none transition;
+    border-color: var(--brand-border);
+    background: color-mix(in oklab, var(--brand-card-bg) 86%, var(--brand-bg) 14%);
+    color: var(--brand-ink);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+
+  .ui-input::placeholder,
+  .ui-textarea::placeholder {
+    color: color-mix(in oklab, var(--brand-muted) 78%, transparent);
+  }
+
+  .ui-input,
+  .ui-select {
+    @apply h-11;
+  }
+
+  .ui-textarea {
+    @apply py-2.5;
+    min-height: 112px;
+    resize: vertical;
+  }
+
+  .ui-input:focus,
+  .ui-select:focus,
+  .ui-textarea:focus {
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand-primary) 16%, transparent);
+  }
+
+  .form-surface {
+    border: 1px solid color-mix(in oklab, var(--brand-border) 88%, transparent);
+    background: color-mix(in oklab, var(--brand-card-bg) 88%, var(--brand-bg) 12%);
+    @apply rounded-2xl p-4;
+  }
+}
