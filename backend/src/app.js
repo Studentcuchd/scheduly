@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import compression from "compression";
+import { fileURLToPath } from "url";
 import { errorHandler } from "./middleware/errorHandler.js";
 
 import eventTypeRoutes from "./routes/eventType.routes.js";
@@ -28,5 +29,14 @@ app.use("/api/meetings", meetingRoutes);
 app.use("/api", publicBookingRoutes);
 
 app.use(errorHandler);
+
+const isDirectRun = process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1];
+
+if (isDirectRun) {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
 
 export default app;
