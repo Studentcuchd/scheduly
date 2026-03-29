@@ -18,6 +18,10 @@ export const useEventTypes = () => {
       setEventTypes(items);
       return items;
     } catch (err) {
+      console.error("Failed to fetch event types", {
+        status: err?.response?.status,
+        message: err?.message,
+      });
       const message = err?.response?.data?.message || "Failed to fetch event types.";
       setError(message);
       toast.error(message);

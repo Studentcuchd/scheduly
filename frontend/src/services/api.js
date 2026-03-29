@@ -1,32 +1,53 @@
 import axios from "axios";
 
-const API_ROOT = (import.meta.env.VITE_API_URL || "https://scheduly-backend-n6ey.onrender.com").replace(/\/+$/, "");
-const API_BASE = API_ROOT.endsWith("/api") ? API_ROOT : `${API_ROOT}/api`;
+const BASE_URL = (import.meta.env.VITE_API_URL || "https://scheduly-backend-n6ey.onrender.com").replace(/\/+$/, "");
+const API_BASE = BASE_URL.endsWith("/api") ? BASE_URL : `${BASE_URL}/api`;
+console.log("API BASE:", API_BASE);
+
+const apiClient = axios.create();
+
+apiClient.interceptors.request.use((config) => {
+  const requestUrl = `${config.baseURL || ""}${config.url || ""}`;
+  console.log("API CALL:", requestUrl);
+  return config;
+});
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error?.response?.status;
+    const requestUrl = `${error?.config?.baseURL || ""}${error?.config?.url || ""}`;
+    console.error("API ERROR:", { url: requestUrl, status, message: error?.message });
+    return Promise.reject(error);
+  }
+);
 
 export const eventTypeService = {
-  getAll: () => axios.get(`${API_BASE}/events`),
-  create: (data) => axios.post(`${API_BASE}/events`, data),
-  update: (id, data) => axios.put(`${API_BASE}/events/${id}`, data),
-  delete: (id) => axios.delete(`${API_BASE}/events/${id}`),
-  toggle: (id) => axios.patch(`${API_BASE}/events/${id}/toggle`),
+  getAll: () => apiClient.get(`/event-types`, { baseURL: API_BASE }),
+  create: (data) => apiClient.post(`/event-types`, data, { baseURL: API_BASE }),
+  update: (id, data) => apiClient.put(`/event-types/${id}`, data, { baseURL: API_BASE }),
+  delete: (id) => apiClient.delete(`/event-types/${id}`, { baseURL: API_BASE }),
+  toggle: (id) => apiClient.patch(`/event-types/${id}/toggle`, null, { baseURL: API_BASE }),
 };
 
 export const availabilityService = {
-  get: () => axios.get(`${API_BASE}/availability`),
-  save: (data) => axios.put(`${API_BASE}/availability`, data),
+  get: () => apiClient.get(`/availability`, { baseURL: API_BASE }),
+  save: (data) => apiClient.put(`/availability`, data, { baseURL: API_BASE }),
 };
 
 export const bookingService = {
-  getEvent: (username, slug) => axios.get(`${API_BASE}/public/${username}/${slug}`),
-  getSlots: (username, slug, date) => axios.get(`${API_BASE}/slots/${username}/${slug}?date=${date}`),
-  create: (username, slug, data) => axios.post(`${API_BASE}/book`, { ...data, username, slug }),
-  getEventBySlugOnly: (slug) => axios.get(`${API_BASE}/booking/${slug}`),
-  getSlotsBySlugOnly: (slug, date) => axios.get(`${API_BASE}/booking/${slug}/slots?date=${date}`),
-  createBySlugOnly: (slug, data) => axios.post(`${API_BASE}/booking/${slug}`, data),
+  getEvent: (username, slug) => apiClient.get(`/public/${username}/${slug}`, { baseURL: API_BASE }),
+  getSlots: (username, slug, date) => apiClient.get(`/slots/${username}/${slug}`, { baseURL: API_BASE, params: { date } }),
+  create: (username, slug, data) =>
+    apiClient.post(`/book`, { ...data, username, slug }, { baseURL: API_BASE }),
+  getEventBySlugOnly: (slug) => apiClient.get(`/booking/${slug}`, { baseURL: API_BASE }),
+  getSlotsBySlugOnly: (slug, date) =>
+    apiClient.get(`/booking/${slug}/slots`, { baseURL: API_BASE, params: { date } }),
+  createBySlugOnly: (slug, data) => apiClient.post(`/booking/${slug}`, data, { baseURL: API_BASE }),
 };
 
 export const meetingService = {
-  getAll: () => axios.get(`${API_BASE}/meetings`),
-  cancel: (id) => axios.patch(`${API_BASE}/meetings/${id}/cancel`),
-  remove: (id) => axios.delete(`${API_BASE}/meetings/${id}`),
+  getAll: () => apiClient.get(`/meetings`, { baseURL: API_BASE }),
+  cancel: (id) => apiClient.patch(`/meetings/${id}/cancel`, null, { baseURL: API_BASE }),
+  remove: (id) => apiClient.delete(`/meetings/${id}`, { baseURL: API_BASE }),
 };
