@@ -3,3 +3,7 @@ node_modules/
 .prisma/
 dist/
 build/
+frontend/dist/
+backend/dist/
+frontend/.env
+backend/.env
