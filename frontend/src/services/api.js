@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_BASE = (import.meta.env.VITE_API_URL || "https://scheduly-backend-n6ey.onrender.com/api").replace(/\/+$/, "");
+const API_ROOT = (import.meta.env.VITE_API_URL || "https://scheduly-backend-n6ey.onrender.com").replace(/\/+$/, "");
+const API_BASE = API_ROOT.endsWith("/api") ? API_ROOT : `${API_ROOT}/api`;
 
 export const eventTypeService = {
   getAll: () => axios.get(`${API_BASE}/events`),

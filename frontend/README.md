@@ -208,7 +208,7 @@ Set the backend URL before deploying (optional if you want to override the defau
 
 ```bash
 # .env.production
-VITE_API_URL=https://scheduly-backend-n6ey.onrender.com/api
+VITE_API_URL=https://scheduly-backend-n6ey.onrender.com
 ```
 
 ```bash
