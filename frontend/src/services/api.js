@@ -2,13 +2,20 @@ import axios from "axios";
 
 const BASE_URL = (import.meta.env.VITE_API_URL || "https://scheduly-backend-n6ey.onrender.com").replace(/\/+$/, "");
 const API_BASE = BASE_URL.endsWith("/api") ? BASE_URL : `${BASE_URL}/api`;
-console.log("API BASE:", API_BASE);
+const isDev = import.meta.env.DEV;
+
+if (isDev) {
+  console.log("API BASE:", API_BASE);
+}
 
 const apiClient = axios.create();
 
 apiClient.interceptors.request.use((config) => {
-  const requestUrl = `${config.baseURL || ""}${config.url || ""}`;
-  console.log("API CALL:", requestUrl);
+  if (isDev) {
+    const requestUrl = `${config.baseURL || ""}${config.url || ""}`;
+    console.log("API CALL:", requestUrl);
+  }
+
   return config;
 });
 
