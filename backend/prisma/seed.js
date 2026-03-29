@@ -7,6 +7,7 @@ const DEFAULT_USER_ID = "user-001";
 const SAMPLE_MEETING_ID = "seed-meeting-001";
 const EVENT_30_SLUG = "30-min-meeting";
 const EVENT_60_SLUG = "60-min-meeting";
+const DEFAULT_AVAILABILITY_TIMEZONE = "Asia/Kolkata";
 
 const toDateString = (d) => d.toISOString().split("T")[0];
 
@@ -78,6 +79,33 @@ const seed = async () => {
   });
 
   const sampleDate = toDateString(nextBusinessDay());
+
+  const availability = await prisma.availability.upsert({
+    where: { userId: user.id },
+    update: {
+      timezone: DEFAULT_AVAILABILITY_TIMEZONE,
+    },
+    create: {
+      timezone: DEFAULT_AVAILABILITY_TIMEZONE,
+      userId: user.id,
+    },
+  });
+
+  await prisma.availabilityDay.deleteMany({
+    where: { availabilityId: availability.id },
+  });
+
+  await prisma.availabilityDay.createMany({
+    data: [
+      { availabilityId: availability.id, dayOfWeek: 0, isEnabled: false, startTime: "09:00", endTime: "17:00" },
+      { availabilityId: availability.id, dayOfWeek: 1, isEnabled: true, startTime: "09:00", endTime: "17:00" },
+      { availabilityId: availability.id, dayOfWeek: 2, isEnabled: true, startTime: "09:00", endTime: "17:00" },
+      { availabilityId: availability.id, dayOfWeek: 3, isEnabled: true, startTime: "09:00", endTime: "17:00" },
+      { availabilityId: availability.id, dayOfWeek: 4, isEnabled: true, startTime: "09:00", endTime: "17:00" },
+      { availabilityId: availability.id, dayOfWeek: 5, isEnabled: true, startTime: "09:00", endTime: "17:00" },
+      { availabilityId: availability.id, dayOfWeek: 6, isEnabled: false, startTime: "09:00", endTime: "17:00" },
+    ],
+  });
 
   await prisma.meeting.upsert({
     where: { id: SAMPLE_MEETING_ID },
