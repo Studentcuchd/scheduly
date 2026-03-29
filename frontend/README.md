@@ -204,6 +204,13 @@ To integrate with a backend API:
 
 ## Build & Deployment
 
+Set the backend URL before deploying (optional if you want to override the default Render backend):
+
+```bash
+# .env.production
+VITE_API_URL=https://scheduly-backend-n6ey.onrender.com/api
+```
+
 ```bash
 # Production build
 npm run build
