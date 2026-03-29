@@ -17,6 +17,23 @@ app.use(cors({ origin: process.env.CORS_ORIGIN }));
 app.use(compression());
 app.use(express.json({ limit: "256kb" }));
 
+app.get("/api", (req, res) => {
+  res.json({
+    success: true,
+    message: "Scheduly API is running",
+    routes: [
+      "/api/health",
+      "/api/event-types",
+      "/api/availability",
+      "/api/booking",
+      "/api/meetings",
+      "/api/public/:username/:slug",
+      "/api/slots/:username/:slug",
+      "/api/book",
+    ],
+  });
+});
+
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
