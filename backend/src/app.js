@@ -39,4 +39,7 @@ if (isDirectRun) {
   });
 }
 
+app.get("/", (req, res) => {
+  res.send("Scheduly Backend is Running 🚀");
+});
 export default app;
