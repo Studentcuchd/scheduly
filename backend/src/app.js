@@ -1,4 +1,6 @@
-if (process.env.NODE_ENV !== "production") {
+const isRenderRuntime = process.env.RENDER === "true" || Boolean(process.env.RENDER_EXTERNAL_URL);
+
+if (!isRenderRuntime && process.env.NODE_ENV !== "production") {
   await import("dotenv/config");
 }
 import express from "express";
@@ -26,24 +28,21 @@ const envOrigins = (process.env.CORS_ORIGIN || "")
   .map((origin) => origin.trim())
   .filter(Boolean);
 
-const allowWildcardFallback = envOrigins.includes("*");
 const allowedOrigins = Array.from(
-  new Set([...defaultAllowedOrigins, ...envOrigins.filter((origin) => origin !== "*")])
+  new Set([...defaultAllowedOrigins, ...envOrigins])
 );
 
-const corsOptions = allowWildcardFallback
-  ? { origin: process.env.CORS_ORIGIN || "*" }
-  : {
-      origin(origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) {
-          callback(null, true);
-          return;
-        }
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+      return;
+    }
 
-        callback(new Error("Not allowed by CORS"));
-      },
-      credentials: true,
-    };
+    callback(new Error("CORS not allowed"));
+  },
+  credentials: true,
+};
 
 app.use(cors(corsOptions));
 app.use(compression());
@@ -89,7 +88,7 @@ if (isDirectRun) {
     console.log("Database connected successfully.");
 
     app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+      console.log(`Server running on ${PORT}`);
     });
   } catch (error) {
     console.error("Failed to connect to database.", {
