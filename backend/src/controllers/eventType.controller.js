@@ -7,6 +7,11 @@ export const getAll = asyncHandler(async (req, res) => {
   res.json(successResponse(eventTypes));
 });
 
+export const getBySlug = asyncHandler(async (req, res) => {
+  const eventType = await eventTypeService.getEventTypeBySlug(req.params.slug);
+  res.json(successResponse(eventType));
+});
+
 export const create = asyncHandler(async (req, res) => {
   const eventType = await eventTypeService.createEventType(req.body);
   res.status(201).json(successResponse(eventType, "Event type created"));

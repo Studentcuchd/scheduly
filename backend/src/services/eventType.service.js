@@ -11,6 +11,33 @@ const logServiceError = (operation, error, context = {}) => {
   });
 };
 
+const DAY_KEYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+
+const mapAvailabilityForPublic = (availability) => {
+  const days = DAY_KEYS.reduce((acc, key) => {
+    acc[key] = { enabled: false, start: "09:00", end: "17:00" };
+    return acc;
+  }, {});
+
+  for (const day of availability?.days || []) {
+    const key = DAY_KEYS[day.dayOfWeek];
+    if (!key) {
+      continue;
+    }
+
+    days[key] = {
+      enabled: day.isEnabled,
+      start: day.startTime,
+      end: day.endTime,
+    };
+  }
+
+  return {
+    timezone: availability?.timezone || "UTC",
+    days,
+  };
+};
+
 export const getAllEventTypes = async () => {
   try {
     const eventTypes = await prisma.eventType.findMany({
@@ -35,6 +62,52 @@ export const getAllEventTypes = async () => {
     }));
   } catch (error) {
     logServiceError("getAllEventTypes", error, { userId: DEFAULT_USER_ID });
+    throw error;
+  }
+};
+
+export const getEventTypeBySlug = async (slug) => {
+  try {
+    const eventType = await prisma.eventType.findUnique({
+      where: { slug },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            username: true,
+            timezone: true,
+            availability: {
+              include: { days: true },
+            },
+          },
+        },
+      },
+    });
+
+    if (!eventType || !eventType.isActive) {
+      const error = new Error("Event not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    return {
+      id: eventType.id,
+      name: eventType.name,
+      slug: eventType.slug,
+      duration: eventType.duration,
+      description: eventType.description,
+      color: eventType.color,
+      user: {
+        id: eventType.user?.id,
+        name: eventType.user?.name,
+        username: eventType.user?.username,
+        timezone: eventType.user?.timezone,
+      },
+      availability: mapAvailabilityForPublic(eventType.user?.availability),
+    };
+  } catch (error) {
+    logServiceError("getEventTypeBySlug", error, { slug });
     throw error;
   }
 };

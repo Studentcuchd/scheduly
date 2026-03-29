@@ -8,7 +8,7 @@ import BookingForm from "../../components/booking/BookingForm";
 import Loader from "../../components/common/Loader";
 import { APP_NAME, COMPANY, PROJECT_TAGLINE, ROUTES, USER } from "../../constants";
 import { useBooking } from "../../hooks/useBooking";
-import { bookingService } from "../../services/api";
+import { bookingService, eventTypeService } from "../../services/api";
 
 const SESSION_MODES = [
   { value: "Google Meet", label: "Google Meet" },
@@ -18,7 +18,8 @@ const SESSION_MODES = [
 
 const BookingPage = () => {
   const navigate = useNavigate();
-  const { username, slug } = useParams();
+  const { username, slug, eventSlug } = useParams();
+  const resolvedSlug = eventSlug || slug;
   const [step, setStep] = useState("slots");
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [sessionMode, setSessionMode] = useState(SESSION_MODES[0].value);
@@ -39,7 +40,7 @@ const BookingPage = () => {
 
   useEffect(() => {
     const fetchEvent = async () => {
-      if (!slug) {
+      if (!resolvedSlug) {
         setEventError("Invalid booking link.");
         setEventLoading(false);
         return;
@@ -48,16 +49,15 @@ const BookingPage = () => {
       try {
         setEventLoading(true);
         setEventError("");
-        const response = username
-          ? await bookingService.getEvent(username, slug)
-          : await bookingService.getEventBySlugOnly(slug);
+        const response = await eventTypeService.getBySlug(resolvedSlug);
 
         const payload = response?.data?.data;
         setEventType(payload);
         setResolvedUsername(payload?.user?.username || username || "");
         setAvailability(payload?.availability || { timezone: "UTC", days: {} });
       } catch (err) {
-        const message = err?.response?.data?.message || "Unable to load booking page.";
+        const status = err?.response?.status;
+        const message = status === 404 ? "Event not found" : err?.response?.data?.message || "Unable to load booking page.";
         setEventError(message);
       } finally {
         setEventLoading(false);
@@ -65,12 +65,12 @@ const BookingPage = () => {
     };
 
     fetchEvent();
-  }, [slug, username]);
+  }, [resolvedSlug, username]);
 
   const { selectedDate, selectedSlot, availableSlots, slotsLoading, submitting, error, selectDate, selectSlot, submitBooking } =
     useBooking({
       username: resolvedUsername || username,
-      slug,
+      slug: resolvedSlug,
     });
 
   const scheduleEvent = async (form) => {
@@ -106,7 +106,9 @@ const BookingPage = () => {
         endTime: format(slotEnd, "HH:mm"),
       };
 
-      const confirmPath = resolvedUsername ? ROUTES.PUBLIC_CONFIRM(resolvedUsername, slug) : ROUTES.CONFIRM(slug);
+      const confirmPath = resolvedUsername
+        ? ROUTES.PUBLIC_CONFIRM(resolvedUsername, resolvedSlug)
+        : ROUTES.CONFIRM(resolvedSlug);
       navigate(confirmPath, {
         replace: true,
         state: bookingData,

@@ -31,6 +31,7 @@ apiClient.interceptors.response.use(
 
 export const eventTypeService = {
   getAll: () => apiClient.get(`/event-types`, { baseURL: API_BASE }),
+  getBySlug: (slug) => apiClient.get(`/event-types/${slug}`, { baseURL: API_BASE }),
   create: (data) => apiClient.post(`/event-types`, data, { baseURL: API_BASE }),
   update: (id, data) => apiClient.put(`/event-types/${id}`, data, { baseURL: API_BASE }),
   delete: (id) => apiClient.delete(`/event-types/${id}`, { baseURL: API_BASE }),

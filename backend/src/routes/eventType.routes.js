@@ -9,6 +9,7 @@ import {
 const router = Router();
 
 router.get("/", ctrl.getAll);
+router.get("/:slug", ctrl.getBySlug);
 router.post("/", validate(createEventTypeSchema), ctrl.create);
 router.put("/:id", validate(updateEventTypeSchema), ctrl.update);
 router.delete("/:id", ctrl.remove);

@@ -45,6 +45,8 @@ const App = () => {
 
         <Route path="/book/:slug" element={<BookingPage />} />
         <Route path="/book/:slug/confirm" element={<ConfirmationPage />} />
+        <Route path="/:username/:eventSlug" element={<BookingPage />} />
+        <Route path="/:username/:eventSlug/confirm" element={<ConfirmationPage />} />
         <Route path="/:username/:slug" element={<BookingPage />} />
         <Route path="/:username/:slug/confirm" element={<ConfirmationPage />} />
         <Route path="*" element={<Navigate to={ROUTES.ANALYTICS} replace />} />
