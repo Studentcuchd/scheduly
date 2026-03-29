@@ -1,9 +1,12 @@
-import "dotenv/config";
+if (process.env.NODE_ENV !== "production") {
+  await import("dotenv/config");
+}
 import express from "express";
 import cors from "cors";
 import compression from "compression";
 import { fileURLToPath } from "url";
 import { errorHandler } from "./middleware/errorHandler.js";
+import { prisma } from "./config/db.js";
 
 import eventTypeRoutes from "./routes/eventType.routes.js";
 import availabilityRoutes from "./routes/availability.routes.js";
@@ -80,9 +83,21 @@ const isDirectRun = process.argv[1] && fileURLToPath(import.meta.url) === proces
 
 if (isDirectRun) {
   const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
+
+  try {
+    await prisma.$connect();
+    console.log("Database connected successfully.");
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Failed to connect to database.", {
+      message: error?.message,
+      code: error?.code,
+    });
+    process.exit(1);
+  }
 }
 
 app.get("/", (req, res) => {
