@@ -13,7 +13,36 @@ import publicBookingRoutes from "./routes/publicBooking.routes.js";
 
 const app = express();
 
-app.use(cors({ origin: process.env.CORS_ORIGIN }));
+const defaultAllowedOrigins = [
+  "http://localhost:5173",
+  "https://scheduly-gtir.vercel.app",
+];
+
+const envOrigins = (process.env.CORS_ORIGIN || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const allowWildcardFallback = envOrigins.includes("*");
+const allowedOrigins = Array.from(
+  new Set([...defaultAllowedOrigins, ...envOrigins.filter((origin) => origin !== "*")])
+);
+
+const corsOptions = allowWildcardFallback
+  ? { origin: process.env.CORS_ORIGIN || "*" }
+  : {
+      origin(origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true);
+          return;
+        }
+
+        callback(new Error("Not allowed by CORS"));
+      },
+      credentials: true,
+    };
+
+app.use(cors(corsOptions));
 app.use(compression());
 app.use(express.json({ limit: "256kb" }));
 
